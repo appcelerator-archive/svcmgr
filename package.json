@@ -1,0 +1,30 @@
+{
+	"name": "svcmgr",
+	"description": "A Simple service manager",
+	"version": "0.1.0",
+	"keywords": [
+		"service manager",
+		"services",
+		"service",
+		"manager"
+	],
+	"author": {
+		"name": "Appcelerator, Inc.",
+		"email": "npmjs@appcelerator.com"
+	},
+	"maintainers": [
+		{"name": "Chris Barber", "email": "cbarber@appcelerator.com"}
+	],
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/appcelerator/svcmgr.git"
+	},
+	"dependencies": {
+		"async": "~0.9.0"
+	},
+	"license": "Apache Public License v2",
+	"main": "./index",
+	"engines": {
+		"node": ">=0.8"
+	}
+}
