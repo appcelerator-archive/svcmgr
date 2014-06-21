@@ -79,6 +79,10 @@ exports.load = function load(service, cfg, callback) {
 				if (module.paths.indexOf(dir) === -1) {
 					module.paths.unshift(dir);
 				}
+				dir = path.join(dir, 'node_modules');
+				if (module.paths.indexOf(dir) === -1) {
+					module.paths.unshift(dir);
+				}
 			}
 
 			var moduleFile = require.resolve(svc),
@@ -266,10 +270,16 @@ exports.unload = function unload(service, cfg, callback) {
 
 	cfg = mix({}, config, cfg);
 
-	async.eachSeries(getOrderedServices(service).reverse(), function (svc, next) {
+	var svcs = getOrderedServices(service).reverse();
+
+	async.eachSeries(svcs, function (svc, next) {
 		if (!services[svc]) return next();
 
-		exports.stop(svc, cfg, function () {
+		// stop all the services first
+		exports.stop(svc, cfg, next);
+	}, function () {
+		// now unload the services
+		async.eachSeries(svcs, function (svc, next) {
 			function cb() {
 				delete require.cache[services[svc].filename];
 				delete services[svc];
