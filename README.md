@@ -23,7 +23,7 @@ lifecycle handlers.
 
 main.js
 
-	var svcmgr = require('..');
+	var svcmgr = require('svcmgr');
 
 	svcmgr.setup({
 		// arbitrary config settings to pass to all services
