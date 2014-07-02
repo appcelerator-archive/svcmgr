@@ -69,7 +69,7 @@ exports.load = function load(service, cfg, callback) {
 		function (svc, next) {
 			if (!svc || services[svc]) return next();
 
-			cfg.logger && cfg.logger.info('svcmgr: loading "%s"', svc);
+			typeof cfg.logger === 'function' && cfg.logger('loading "%s"', svc);
 
 			if (module.parent) {
 				if (!Array.isArray(module.paths)) {
@@ -170,7 +170,7 @@ exports.start = function start(service, cfg, callback) {
 	async.eachSeries(getOrderedServices(service), function (svc, next) {
 		if (!services[svc]) return next();
 		if (services[svc].running) {
-			cfg.logger && cfg.logger.info('svcmgr: "%s" already running', svc);
+			typeof cfg.logger === 'function' && cfg.logger('"%s" already running', svc);
 			return next();
 		}
 
@@ -184,7 +184,7 @@ exports.start = function start(service, cfg, callback) {
 		var mod = services[svc].module;
 		if (typeof mod.start !== 'function') return cb();
 
-		cfg.logger && cfg.logger.info('svcmgr: starting "%s"', svc);
+		typeof cfg.logger === 'function' && cfg.logger('starting "%s"', svc);
 
 		var deps = services[svc].deps;
 		if (deps) {
@@ -230,7 +230,7 @@ exports.stop = function stop(service, cfg, callback) {
 		var mod = services[svc].module;
 		if (typeof mod.stop !== 'function') return next();
 
-		cfg.logger && cfg.logger.info('svcmgr: stopping "%s"', svc);
+		typeof cfg.logger === 'function' && cfg.logger('stopping "%s"', svc);
 
 		var deps = services[svc].deps;
 		if (deps) {
@@ -289,7 +289,7 @@ exports.unload = function unload(service, cfg, callback) {
 			var mod = services[svc].module;
 			if (typeof mod.unload !== 'function') return cb();
 
-			cfg.logger && cfg.logger.info('svcmgr: unloading "%s"', svc);
+			typeof cfg.logger === 'function' && cfg.logger('unloading "%s"', svc);
 
 			var deps = services[svc].deps;
 			if (deps) {
