@@ -13,7 +13,8 @@ var async = require('async'),
 	fs = require('fs'),
 	path = require('path'),
 	config = {},
-	services = {};
+	services = {},
+	logger = function () {};
 
 /**
  * Mixes multiple objects into a single object.
@@ -63,13 +64,24 @@ exports.load = function load(service, cfg, callback) {
 
 	cfg = mix({}, config, cfg);
 
+	if (typeof cfg.logger === 'function') {
+		logger = cfg.logger;
+	} else if (cfg.logger && typeof cfg.logger === 'object') {
+		if (cfg.logger.addLevel) {
+			cfg.logger.addLevel('svcmgr', 'blue');
+			logger = cfg.logger.svcmgr;
+		} else {
+			logger = console.info;
+		}
+	}
+
 	async.eachSeries(
 		Array.isArray(service) ? service : [service],
 
 		function (svc, next) {
 			if (!svc || services[svc]) return next();
 
-			typeof cfg.logger === 'function' && cfg.logger('loading "%s"', svc);
+			logger('loading "%s"', svc);
 
 			if (module.parent) {
 				if (!Array.isArray(module.paths)) {
@@ -170,7 +182,7 @@ exports.start = function start(service, cfg, callback) {
 	async.eachSeries(getOrderedServices(service), function (svc, next) {
 		if (!services[svc]) return next();
 		if (services[svc].running) {
-			typeof cfg.logger === 'function' && cfg.logger('"%s" already running', svc);
+			logger('"%s" already running', svc);
 			return next();
 		}
 
@@ -184,7 +196,7 @@ exports.start = function start(service, cfg, callback) {
 		var mod = services[svc].module;
 		if (typeof mod.start !== 'function') return cb();
 
-		typeof cfg.logger === 'function' && cfg.logger('starting "%s"', svc);
+		logger('starting "%s"', svc);
 
 		var deps = services[svc].deps;
 		if (deps) {
@@ -230,7 +242,7 @@ exports.stop = function stop(service, cfg, callback) {
 		var mod = services[svc].module;
 		if (typeof mod.stop !== 'function') return next();
 
-		typeof cfg.logger === 'function' && cfg.logger('stopping "%s"', svc);
+		logger('stopping "%s"', svc);
 
 		var deps = services[svc].deps;
 		if (deps) {
@@ -289,7 +301,7 @@ exports.unload = function unload(service, cfg, callback) {
 			var mod = services[svc].module;
 			if (typeof mod.unload !== 'function') return cb();
 
-			typeof cfg.logger === 'function' && cfg.logger('unloading "%s"', svc);
+			logger('unloading "%s"', svc);
 
 			var deps = services[svc].deps;
 			if (deps) {
